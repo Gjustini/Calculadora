@@ -108,7 +108,7 @@
             const ivaExcedente = (excedente + montoArancel) * iva; // IVA sobre el excedente con arancel
 
             // Total en USD
-            const precioFinalUSD = montoBaseConIVA + ivaExcedente;
+            const precioFinalUSD = montoBaseConIVA + excedente + montoArancel + ivaExcedente;
 
             // Total en ARS
             const precioFinalARS = precioFinalUSD * dolarBlue;
