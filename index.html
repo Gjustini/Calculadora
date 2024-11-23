@@ -67,12 +67,11 @@
         <h1>Calculadora de Importación</h1>
         <div class="form-group">
             <label for="precio">Precio del producto (USD)</label>
-            <input type="number" id="precio" placeholder="Ej: 300">
+            <input type="number" id="precio" placeholder="Ej: 829">
         </div>
         <div class="form-group">
             <label for="categoria">Categoría</label>
             <select id="categoria">
-                <option value="general">Bienes Generales (400 USD)</option>
                 <option value="tecnologia">Tecnología (3000 USD)</option>
             </select>
         </div>
@@ -95,25 +94,23 @@
         }
 
         function calcularImportacion(precio, categoria, dolarBlue) {
-            const limites = {
-                general: 400,
-                tecnologia: 3000
-            };
+            const limiteBase = 400;
             const iva = 0.21;
             const arancel = 0.38;
 
-            if (precio > limites[categoria]) {
-                return `El producto excede el límite de ${limites[categoria]} USD para la categoría seleccionada.`;
-            }
+            // Primeros 400 USD
+            const montoBaseConIVA = limiteBase * 1.21;
 
-            let impuestos = precio * iva; // IVA para todo el precio
-            if (categoria === "tecnologia" && precio > 400) {
-                const excedente = precio - 400;
-                impuestos += excedente * arancel; // Arancel del excedente
-            }
+            // Excedente
+            let excedente = Math.max(0, precio - limiteBase);
+            let excedenteConArancel = excedente * 1.38;
+            let excedenteConIVA = excedenteConArancel * 1.21;
 
-            const precioFinalUSD = precio + impuestos; // Total en dólares
-            const precioFinalARS = precioFinalUSD * dolarBlue; // Total en pesos argentinos
+            // Total en USD
+            const precioFinalUSD = montoBaseConIVA + excedenteConIVA;
+
+            // Total en ARS
+            const precioFinalARS = precioFinalUSD * dolarBlue;
 
             // Formatear los resultados
             const formatoPesos = new Intl.NumberFormat('es-AR', {
@@ -125,7 +122,8 @@
             return {
                 texto: `
                     Precio del Producto: ${precio.toFixed(2)} USD<br>
-                    Impuestos (IVA + Aranceles): ${impuestos.toFixed(2)} USD<br>
+                    Primeros 400 USD (con IVA): ${montoBaseConIVA.toFixed(2)} USD<br>
+                    Excedente (con arancel e IVA): ${excedenteConIVA.toFixed(2)} USD<br>
                     Total a pagar en USD: ${precioFinalUSD.toFixed(2)} USD<br>
                     Total a pagar en ARS: ${formatoPesos}
                 `,
