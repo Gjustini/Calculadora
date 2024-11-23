@@ -19,13 +19,27 @@
             background: #fff;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
         }
         h1 {
-            text-align: center;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        .logos {
+            margin: 20px 0;
+        }
+        .logos img {
+            width: 100px;
+            margin: 0 10px;
+        }
+        p {
+            font-size: 16px;
             margin-bottom: 20px;
+            color: #555;
         }
         .form-group {
             margin-bottom: 15px;
+            text-align: left;
         }
         label {
             display: block;
@@ -38,11 +52,14 @@
             font-size: 16px;
             border: 1px solid #ccc;
             border-radius: 5px;
+            margin-bottom: 15px;
         }
         button {
             background: #007bff;
             color: #fff;
             cursor: pointer;
+            font-weight: bold;
+            border: none;
         }
         button:hover {
             background: #0056b3;
@@ -54,6 +71,7 @@
             border: 1px solid #c8e6c9;
             border-radius: 5px;
             font-weight: bold;
+            text-align: left;
         }
         .source {
             margin-top: 10px;
@@ -65,6 +83,11 @@
 <body>
     <div class="container">
         <h1>Calculadora de Importación</h1>
+        <div class="logos">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" alt="Amazon Logo">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/1/1b/Ebay_logo.svg" alt="eBay Logo">
+        </div>
+        <p>Ingresa el precio de tu producto y nosotros calculamos el costo final por ti. Ideal para tus compras en Amazon, eBay y más.</p>
         <div class="form-group">
             <label for="precio">Precio del producto (USD)</label>
             <input type="number" id="precio" placeholder="Ej: 829">
@@ -96,24 +119,18 @@
             const iva = 0.21;
             const arancel = 0.38;
 
-            // Sumar costo de envío al precio base
             const precioTotal = precio + envio;
 
-            // Cálculo para los primeros 400 USD
             const montoBaseConIVA = Math.min(precioTotal, limiteBase) * (1 + iva);
 
-            // Cálculo del excedente
             const excedente = Math.max(0, precioTotal - limiteBase);
-            const montoArancel = excedente * arancel; // 38% de arancel sobre el excedente
-            const ivaExcedente = (excedente + montoArancel) * iva; // IVA sobre el excedente con arancel
+            const montoArancel = excedente * arancel;
+            const ivaExcedente = (excedente + montoArancel) * iva;
 
-            // Total en USD
             const precioFinalUSD = montoBaseConIVA + excedente + montoArancel + ivaExcedente;
 
-            // Total en ARS
             const precioFinalARS = precioFinalUSD * dolarBlue;
 
-            // Formatear los resultados
             const formatoPesos = new Intl.NumberFormat('es-AR', {
                 style: 'currency',
                 currency: 'ARS',
@@ -125,7 +142,7 @@
                     Precio del Producto: ${precio.toFixed(2)} USD<br>
                     Costo de Envío: ${envio.toFixed(2)} USD<br>
                     Total con Envío: ${precioTotal.toFixed(2)} USD<br>
-                    Primeros ${limiteBase} USD (con IVA): ${montoBaseConIVA.toFixed(2)} USD<br>
+                    Primeros 400 USD (con IVA): ${montoBaseConIVA.toFixed(2)} USD<br>
                     Excedente: ${excedente.toFixed(2)} USD<br>
                     Arancel (38% sobre excedente): ${montoArancel.toFixed(2)} USD<br>
                     IVA sobre excedente con arancel: ${ivaExcedente.toFixed(2)} USD<br>
