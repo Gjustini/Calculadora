@@ -103,10 +103,9 @@
             const montoBaseConIVA = Math.min(precioTotal, limiteBase) * (1 + iva);
 
             // Cálculo del excedente
-            let excedente = Math.max(0, precioTotal - limiteBase);
-            let montoArancel = excedente * arancel; // 38% de arancel sobre el excedente
-            let excedenteConArancel = excedente + montoArancel;
-            let ivaExcedente = excedenteConArancel * iva; // IVA sobre el excedente con arancel
+            const excedente = Math.max(0, precioTotal - limiteBase);
+            const montoArancel = excedente * arancel; // 38% de arancel sobre el excedente
+            const ivaExcedente = (excedente + montoArancel) * iva; // IVA sobre el excedente con arancel
 
             // Total en USD
             const precioFinalUSD = montoBaseConIVA + ivaExcedente;
