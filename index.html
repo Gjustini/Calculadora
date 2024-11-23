@@ -68,6 +68,11 @@
             border: 1px solid #c8e6c9;
             border-radius: 5px;
         }
+        .note {
+            margin-top: 10px;
+            font-size: 12px;
+            color: #555;
+        }
     </style>
 </head>
 <body>
@@ -87,6 +92,9 @@
         </div>
         <button onclick="calcular()">Calcular</button>
         <div class="result" id="resultado"></div>
+        <div class="note">
+            <small>* Nota: Los cálculos se realizan con una precisión de tres decimales. Puede haber ligeras diferencias al redondear los resultados.</small>
+        </div>
     </div>
 
     <script>
@@ -119,33 +127,39 @@
             const precioTotal = precio + envio;
 
             // Cálculo de los primeros $400 con IVA
-            const baseConIVA = Math.min(precioTotal, limiteBase);
-            const ivaSobreBase = baseConIVA * iva;
+            const baseConIVA = Math.min(precioTotal, limiteBase).toFixed(3);
+            const ivaSobreBase = (baseConIVA * iva).toFixed(3);
 
             // Cálculo del excedente (si supera los $400)
-            const excedente = Math.max(0, precioTotal - limiteBase);
-            const montoArancel = excedente * arancel;
-            const ivaSobreExcedente = (excedente + montoArancel) * iva;
+            const excedente = Math.max(0, precioTotal - limiteBase).toFixed(3);
+            const montoArancel = (excedente * arancel).toFixed(3);
+            const ivaSobreExcedente = ((parseFloat(excedente) + parseFloat(montoArancel)) * iva).toFixed(3);
 
             // Total final en USD
-            const precioFinalUSD = baseConIVA + ivaSobreBase + excedente + montoArancel + ivaSobreExcedente;
+            const precioFinalUSD = (
+                parseFloat(baseConIVA) +
+                parseFloat(ivaSobreBase) +
+                parseFloat(excedente) +
+                parseFloat(montoArancel) +
+                parseFloat(ivaSobreExcedente)
+            ).toFixed(3);
 
             // Total final en ARS (conversión al dólar blue)
-            const precioFinalARS = (precioFinalUSD * dolarBlue.valorDolar).toFixed(2);
+            const precioFinalARS = (precioFinalUSD * dolarBlue.valorDolar).toFixed(3);
 
             // Mostrar resultados
             document.getElementById('resultado').innerHTML = `
                 <h3>Resultados:</h3>
                 Precio del Producto: $${precio.toFixed(2)} USD<br>
                 Costo de Envío: $${envio.toFixed(2)} USD<br>
-                <strong>Total en USD: $${precioFinalUSD.toFixed(2)} USD</strong><br>
+                <strong>Total en USD: $${precioFinalUSD}</strong><br>
                 <strong>Total en ARS: $${parseFloat(precioFinalARS).toLocaleString('es-AR', { minimumFractionDigits: 2 })} ARS</strong><br>
                 <strong>Desglose Detallado:</strong><br>
-                - Primeros $400: $${baseConIVA.toFixed(2)} USD<br>
-                - IVA sobre primeros $400: $${ivaSobreBase.toFixed(2)} USD<br>
-                - Excedente: $${excedente.toFixed(2)} USD<br>
-                - Arancel (38% sobre excedente): $${montoArancel.toFixed(2)} USD<br>
-                - IVA sobre excedente y arancel: $${ivaSobreExcedente.toFixed(2)} USD<br>
+                - Primeros $400: $${baseConIVA} USD<br>
+                - IVA sobre primeros $400: $${ivaSobreBase} USD<br>
+                - Excedente: $${excedente} USD<br>
+                - Arancel (38% sobre excedente): $${montoArancel} USD<br>
+                - IVA sobre excedente y arancel: $${ivaSobreExcedente} USD<br>
                 <small>Fuente del dólar blue: ${dolarBlue.fuente} - Valor utilizado: $${dolarBlue.valorDolar.toFixed(2)} ARS</small>
             `;
         }
