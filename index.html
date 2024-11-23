@@ -13,7 +13,7 @@
             color: #333;
         }
         .container {
-            max-width: 800px;
+            max-width: 600px;
             margin: 50px auto;
             padding: 20px;
             background: #fff;
@@ -21,27 +21,9 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
         h1 {
+            text-align: center;
             font-size: 24px;
-            margin-bottom: 10px;
-            text-align: center;
-        }
-        .product-list, .history, .comparison {
-            margin: 20px 0;
-        }
-        .product {
-            display: inline-block;
-            width: 45%;
-            margin: 10px 2.5%;
-            text-align: center;
-            background-color: #f9f9f9;
-            padding: 10px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            cursor: pointer;
-        }
-        .product img {
-            max-width: 100%;
-            border-radius: 5px;
+            margin-bottom: 20px;
         }
         .form-group {
             margin-bottom: 15px;
@@ -69,7 +51,8 @@
         button:hover {
             background: #0056b3;
         }
-        .result, .history, .comparison {
+        .result {
+            margin-top: 20px;
             padding: 15px;
             background: #e8f5e9;
             border: 1px solid #c8e6c9;
@@ -87,29 +70,16 @@
 <body>
     <div class="container">
         <h1>Calculadora de Importación</h1>
-        
-        <!-- Galería de productos -->
-        <div class="product-list">
-            <h2>Productos Populares</h2>
-            <div class="product" onclick="cargarProducto(999, 'iPhone 14 Pro Max')">
-                <img src="https://via.placeholder.com/150" alt="iPhone 14 Pro Max">
-                <p>iPhone 14 Pro Max</p>
-                <p>Precio internacional: $999 USD</p>
-            </div>
-            <div class="product" onclick="cargarProducto(499, 'PlayStation 5')">
-                <img src="https://via.placeholder.com/150" alt="PlayStation 5">
-                <p>PlayStation 5</p>
-                <p>Precio internacional: $499 USD</p>
-            </div>
-        </div>
-
-        <!-- Formulario de cálculo -->
         <div class="form-group">
-            <label for="precio">Precio del producto (USD)</label>
+            <label for="producto">Nombre del Producto</label>
+            <input type="text" id="producto" placeholder="Ej: iPhone 14 Pro Max">
+        </div>
+        <div class="form-group">
+            <label for="precio">Precio del Producto (USD)</label>
             <input type="number" id="precio" placeholder="Ej: 829">
         </div>
         <div class="form-group">
-            <label for="envio">Costo de envío (USD)</label>
+            <label for="envio">Costo de Envío (USD)</label>
             <input type="number" id="envio" placeholder="Ej: 50">
         </div>
         <div class="form-group">
@@ -122,37 +92,11 @@
         </div>
         <button onclick="calcular()">Calcular</button>
         <div id="loading" class="loading">Calculando...</div>
-
-        <!-- Resultados -->
         <div class="result" id="resultado"></div>
-
-        <!-- Historial -->
-        <div class="history">
-            <h2>Historial de Cálculos</h2>
-            <ul id="calculoHistorial"></ul>
-        </div>
-
-        <!-- Comparativa -->
-        <div class="comparison">
-            <h2>Comparativa de Precios</h2>
-            <table border="1" id="comparativa">
-                <tr>
-                    <th>Concepto</th>
-                    <th>Costo (USD)</th>
-                </tr>
-            </table>
-        </div>
-
-        <button onclick="exportarPDF()">Descargar Cálculo en PDF</button>
+        <button onclick="compartirCalculo()">Compartir este cálculo</button>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
     <script>
-        function cargarProducto(precio, nombre) {
-            document.getElementById('precio').value = precio;
-            alert(`Has seleccionado: ${nombre}. Precio cargado: $${precio} USD`);
-        }
-
         function calcularEnvio() {
             const envio = parseFloat(document.getElementById('tipoEnvio').value);
             document.getElementById('envio').value = envio;
@@ -166,35 +110,12 @@
             }, 2000);
         }
 
-        function guardarEnHistorial(precioFinalUSD, precioFinalARS) {
-            const historial = document.getElementById('calculoHistorial');
-            const item = document.createElement('li');
-            item.innerHTML = `USD: ${precioFinalUSD} | ARS: ${precioFinalARS}`;
-            historial.appendChild(item);
-        }
-
-        function agregarComparativa(precioLocal, precioImportado) {
-            const tabla = document.getElementById('comparativa');
-            const filaLocal = `<tr><td>Precio Local</td><td>${precioLocal}</td></tr>`;
-            const filaImportado = `<tr><td>Precio Importado</td><td>${precioImportado}</td></tr>`;
-            const filaAhorro = `<tr><td>Ahorro</td><td>${(precioLocal - precioImportado).toFixed(2)}</td></tr>`;
-            tabla.innerHTML += filaLocal + filaImportado + filaAhorro;
-        }
-
-        function exportarPDF() {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            const contenido = document.getElementById('resultado').innerText;
-            doc.text(contenido, 10, 10);
-            doc.save('calculo_importacion.pdf');
-        }
-
         function calcular() {
             mostrarCargando();
+            const producto = document.getElementById('producto').value || 'Producto desconocido';
             const precio = parseFloat(document.getElementById('precio').value);
             const envio = parseFloat(document.getElementById('envio').value);
-            const dolarBlue = 500; // Puedes reemplazar esto con un valor dinámico
-            const precioLocalEstimado = 1500; // Ejemplo para la comparación
+            const dolarBlue = 500; // Reemplazar con valor dinámico si se necesita
 
             const limiteBase = 400;
             const iva = 0.21;
@@ -210,14 +131,24 @@
             const precioFinalARS = precioFinalUSD * dolarBlue;
 
             document.getElementById('resultado').innerHTML = `
-                <h3>Resultados:</h3>
+                <h3>Resultados para ${producto}:</h3>
                 Precio del Producto: $${precio.toFixed(2)} USD<br>
                 Costo de Envío: $${envio.toFixed(2)} USD<br>
-                Total en USD: $${precioFinalUSD.toFixed(2)} USD<br>
-                Total en ARS: $${precioFinalARS.toFixed(2)} ARS
+                Total (USD): $${precioFinalUSD.toFixed(2)}<br>
+                Total (ARS): $${precioFinalARS.toFixed(2)}<br>
+                <strong>Desglose:</strong><br>
+                - IVA sobre primeros $400: $${(montoBaseConIVA - 400).toFixed(2)} USD<br>
+                - Excedente: $${excedente.toFixed(2)} USD<br>
+                - Arancel (38% sobre excedente): $${montoArancel.toFixed(2)} USD<br>
+                - IVA sobre excedente: $${ivaExcedente.toFixed(2)} USD
             `;
-            guardarEnHistorial(precioFinalUSD, precioFinalARS);
-            agregarComparativa(precioLocalEstimado, precioFinalUSD);
+        }
+
+        function compartirCalculo() {
+            const resultado = document.getElementById('resultado').innerText;
+            const mensaje = `Mira el cálculo que hice con esta calculadora:\n\n${resultado}`;
+            const whatsappURL = `https://wa.me/?text=${encodeURIComponent(mensaje)}`;
+            window.open(whatsappURL, '_blank');
         }
     </script>
 </body>
