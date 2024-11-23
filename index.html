@@ -119,15 +119,16 @@
             const precioTotal = precio + envio;
 
             // Cálculo de los primeros $400 con IVA
-            const montoBaseConIVA = Math.min(precioTotal, limiteBase) * (1 + iva);
+            const baseConIVA = Math.min(precioTotal, limiteBase);
+            const ivaSobreBase = baseConIVA * iva;
 
             // Cálculo del excedente (si supera los $400)
             const excedente = Math.max(0, precioTotal - limiteBase);
             const montoArancel = excedente * arancel;
-            const ivaExcedente = (excedente + montoArancel) * iva;
+            const ivaSobreExcedente = (excedente + montoArancel) * iva;
 
             // Total final en USD
-            const precioFinalUSD = montoBaseConIVA + excedente + montoArancel + ivaExcedente;
+            const precioFinalUSD = baseConIVA + ivaSobreBase + excedente + montoArancel + ivaSobreExcedente;
 
             // Total final en ARS (conversión al dólar blue)
             const precioFinalARS = precioFinalUSD * dolarBlue.valorDolar;
@@ -139,11 +140,12 @@
                 Costo de Envío: $${envio.toFixed(2)} USD<br>
                 <strong>Total en USD: $${precioFinalUSD.toFixed(2)} USD</strong><br>
                 <strong>Total en ARS: $${precioFinalARS.toLocaleString('es-AR', { minimumFractionDigits: 2 })} ARS</strong><br>
-                <strong>Desglose:</strong><br>
-                - Primeros $400 (con IVA): $${montoBaseConIVA.toFixed(2)} USD<br>
+                <strong>Desglose Detallado:</strong><br>
+                - Primeros $400: $${baseConIVA.toFixed(2)} USD<br>
+                - IVA sobre primeros $400: $${ivaSobreBase.toFixed(2)} USD<br>
                 - Excedente: $${excedente.toFixed(2)} USD<br>
                 - Arancel (38% sobre excedente): $${montoArancel.toFixed(2)} USD<br>
-                - IVA sobre excedente y arancel: $${ivaExcedente.toFixed(2)} USD<br>
+                - IVA sobre excedente y arancel: $${ivaSobreExcedente.toFixed(2)} USD<br>
                 <small>Fuente: <a href="${dolarBlue.fuente}" target="_blank">Bluelytics</a></small>
             `;
         }
