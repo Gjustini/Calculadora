@@ -94,7 +94,7 @@
             try {
                 const response = await fetch('https://api.bluelytics.com.ar/v2/latest');
                 const data = await response.json();
-                return { valorDolar: data.blue.value_sell, fuente: "Bluelytics (https://bluelytics.com.ar/)" };
+                return { valorDolar: parseFloat(data.blue.value_sell), fuente: "Bluelytics (https://bluelytics.com.ar/)" };
             } catch (error) {
                 alert("Error al obtener el valor del dólar blue. Intenta nuevamente más tarde.");
                 return { valorDolar: 0, fuente: "" };
@@ -131,7 +131,7 @@
             const precioFinalUSD = baseConIVA + ivaSobreBase + excedente + montoArancel + ivaSobreExcedente;
 
             // Total final en ARS (conversión al dólar blue)
-            const precioFinalARS = precioFinalUSD * dolarBlue.valorDolar;
+            const precioFinalARS = (precioFinalUSD * dolarBlue.valorDolar).toFixed(2);
 
             // Mostrar resultados
             document.getElementById('resultado').innerHTML = `
@@ -139,7 +139,7 @@
                 Precio del Producto: $${precio.toFixed(2)} USD<br>
                 Costo de Envío: $${envio.toFixed(2)} USD<br>
                 <strong>Total en USD: $${precioFinalUSD.toFixed(2)} USD</strong><br>
-                <strong>Total en ARS: $${precioFinalARS.toLocaleString('es-AR', { minimumFractionDigits: 2 })} ARS</strong><br>
+                <strong>Total en ARS: $${parseFloat(precioFinalARS).toLocaleString('es-AR', { minimumFractionDigits: 2 })} ARS</strong><br>
                 <strong>Desglose Detallado:</strong><br>
                 - Primeros $400: $${baseConIVA.toFixed(2)} USD<br>
                 - IVA sobre primeros $400: $${ivaSobreBase.toFixed(2)} USD<br>
