@@ -90,7 +90,18 @@
     </div>
 
     <script>
-        function calcular() {
+        async function obtenerDolarBlue() {
+            try {
+                const response = await fetch('https://api.bluelytics.com.ar/v2/latest');
+                const data = await response.json();
+                return { valorDolar: data.blue.value_sell, fuente: "https://bluelytics.com.ar/" };
+            } catch (error) {
+                alert("Error al obtener el valor del dólar blue. Intenta nuevamente más tarde.");
+                return { valorDolar: 0, fuente: "" };
+            }
+        }
+
+        async function calcular() {
             const precio = parseFloat(document.getElementById('precio').value);
             const envio = parseFloat(document.getElementById('envio').value) || 0;
 
@@ -103,6 +114,8 @@
             const iva = 0.21;
             const arancel = 0.38;
 
+            const dolarBlue = await obtenerDolarBlue();
+
             const precioTotal = precio + envio;
 
             const montoBaseConIVA = Math.min(precioTotal, limiteBase) * (1 + iva);
@@ -111,17 +124,20 @@
             const ivaExcedente = (excedente + montoArancel) * iva;
 
             const precioFinalUSD = montoBaseConIVA + excedente + montoArancel + ivaExcedente;
+            const precioFinalARS = precioFinalUSD * dolarBlue.valorDolar;
 
             document.getElementById('resultado').innerHTML = `
                 <h3>Resultados:</h3>
                 Precio del Producto: $${precio.toFixed(2)} USD<br>
                 Costo de Envío: $${envio.toFixed(2)} USD<br>
-                Total en USD: $${precioFinalUSD.toFixed(2)}<br>
+                Total en USD: $${precioFinalUSD.toFixed(2)} USD<br>
+                Total en ARS: $${precioFinalARS.toLocaleString('es-AR', { minimumFractionDigits: 2 })} ARS<br>
                 <strong>Desglose:</strong><br>
-                - IVA sobre primeros $400: $${(montoBaseConIVA - 400).toFixed(2)} USD<br>
+                - IVA sobre primeros $400: $${(montoBaseConIVA - limiteBase).toFixed(2)} USD<br>
                 - Excedente: $${excedente.toFixed(2)} USD<br>
                 - Arancel (38% sobre excedente): $${montoArancel.toFixed(2)} USD<br>
-                - IVA sobre excedente: $${ivaExcedente.toFixed(2)} USD
+                - IVA sobre excedente: $${ivaExcedente.toFixed(2)} USD<br>
+                <small>Fuente: <a href="${dolarBlue.fuente}" target="_blank">Bluelytics</a></small>
             `;
         }
     </script>
