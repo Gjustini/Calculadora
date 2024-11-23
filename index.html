@@ -90,7 +90,18 @@
     </div>
 
     <script>
-        function calcular() {
+        async function obtenerDolarBlue() {
+            try {
+                const response = await fetch('https://api.bluelytics.com.ar/v2/latest');
+                const data = await response.json();
+                return { valorDolar: data.blue.value_sell, fuente: "Bluelytics (https://bluelytics.com.ar/)" };
+            } catch (error) {
+                alert("Error al obtener el valor del dólar blue. Intenta nuevamente más tarde.");
+                return { valorDolar: 0, fuente: "" };
+            }
+        }
+
+        async function calcular() {
             const precio = parseFloat(document.getElementById('precio').value);
             const envio = parseFloat(document.getElementById('envio').value) || 0;
 
@@ -103,25 +114,39 @@
             const iva = 0.21;
             const arancel = 0.38;
 
+            const dolarBlue = await obtenerDolarBlue();
+
             const precioTotal = precio + envio;
 
-            const montoBaseConIVA = Math.min(precioTotal, limiteBase) * (1 + iva);
+            // Cálculo de los primeros $400 con IVA
+            const baseConIVA = Math.min(precioTotal, limiteBase);
+            const ivaSobreBase = baseConIVA * iva;
+
+            // Cálculo del excedente (si supera los $400)
             const excedente = Math.max(0, precioTotal - limiteBase);
             const montoArancel = excedente * arancel;
-            const ivaExcedente = (excedente + montoArancel) * iva;
+            const ivaSobreExcedente = (excedente + montoArancel) * iva;
 
-            const precioFinalUSD = montoBaseConIVA + excedente + montoArancel + ivaExcedente;
+            // Total final en USD
+            const precioFinalUSD = baseConIVA + ivaSobreBase + excedente + montoArancel + ivaSobreExcedente;
 
+            // Total final en ARS (conversión al dólar blue)
+            const precioFinalARS = precioFinalUSD * dolarBlue.valorDolar;
+
+            // Mostrar resultados
             document.getElementById('resultado').innerHTML = `
                 <h3>Resultados:</h3>
                 Precio del Producto: $${precio.toFixed(2)} USD<br>
                 Costo de Envío: $${envio.toFixed(2)} USD<br>
-                Total en USD: $${precioFinalUSD.toFixed(2)}<br>
-                <strong>Desglose:</strong><br>
-                - IVA sobre primeros $400: $${(montoBaseConIVA - 400).toFixed(2)} USD<br>
+                <strong>Total en USD: $${precioFinalUSD.toFixed(2)} USD</strong><br>
+                <strong>Total en ARS: $${precioFinalARS.toLocaleString('es-AR', { minimumFractionDigits: 2 })} ARS</strong><br>
+                <strong>Desglose Detallado:</strong><br>
+                - Primeros $400: $${baseConIVA.toFixed(2)} USD<br>
+                - IVA sobre primeros $400: $${ivaSobreBase.toFixed(2)} USD<br>
                 - Excedente: $${excedente.toFixed(2)} USD<br>
                 - Arancel (38% sobre excedente): $${montoArancel.toFixed(2)} USD<br>
-                - IVA sobre excedente: $${ivaExcedente.toFixed(2)} USD
+                - IVA sobre excedente y arancel: $${ivaSobreExcedente.toFixed(2)} USD<br>
+                <small>Fuente del dólar blue: ${dolarBlue.fuente} - Valor utilizado: $${dolarBlue.valorDolar.toFixed(2)} ARS</small>
             `;
         }
     </script>
