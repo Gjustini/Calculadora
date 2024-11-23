@@ -112,10 +112,10 @@
                 impuestos += excedente * arancel; // Arancel del excedente
             }
 
-            const precioFinalUSD = precio + impuestos;
-            const precioFinalARS = precioFinalUSD * dolarBlue;
+            const precioFinalUSD = precio + impuestos; // Total en dólares
+            const precioFinalARS = precioFinalUSD * dolarBlue; // Total en pesos argentinos
 
-            // Formatear el resultado en ARS con separadores y decimales
+            // Formatear los resultados
             const formatoPesos = new Intl.NumberFormat('es-AR', {
                 style: 'currency',
                 currency: 'ARS',
@@ -126,10 +126,11 @@
                 texto: `
                     Precio del Producto: ${precio.toFixed(2)} USD<br>
                     Impuestos (IVA + Aranceles): ${impuestos.toFixed(2)} USD<br>
-                    Total en USD: ${precioFinalUSD.toFixed(2)} USD<br>
-                    Total en ARS: ${formatoPesos}
+                    Total a pagar en USD: ${precioFinalUSD.toFixed(2)} USD<br>
+                    Total a pagar en ARS: ${formatoPesos}
                 `,
-                totalPesos: formatoPesos
+                totalPesos: formatoPesos,
+                totalUSD: precioFinalUSD.toFixed(2)
             };
         }
 
