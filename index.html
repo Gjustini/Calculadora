@@ -84,9 +84,7 @@
     <div class="container">
         <h1>Calculadora de Importación</h1>
         <div class="logos">
-            <!-- Logo de Amazon -->
             <img src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" alt="Amazon Logo">
-            <!-- Logo de eBay -->
             <img src="https://upload.wikimedia.org/wikipedia/commons/1/1b/EBay_logo.svg" alt="eBay Logo">
         </div>
         <p>Ingresa el precio de tu producto y nosotros calculamos el costo final por ti. Ideal para tus compras en Amazon, eBay y más.</p>
@@ -106,10 +104,10 @@
     <script>
         async function obtenerDolarBlue() {
             try {
-                const response = await fetch('https://api.bluelytics.com.ar/v2/latest');
+                const response = await fetch('https://api.bluelytics.com.ar/v2/latest'); // Mantiene la funcionalidad de la API
                 const data = await response.json();
                 const dolarBlue = data.blue.value_sell; // Valor de venta del dólar blue
-                return { valor: dolarBlue, fuente: "https://api.bluelytics.com.ar/" };
+                return { valor: dolarBlue, fuente: "BlueLytics - Cotización del dólar blue" }; // Cambia el texto visual aquí
             } catch (error) {
                 alert("Error al obtener el valor del dólar blue. Intenta nuevamente más tarde.");
                 return null;
@@ -171,10 +169,10 @@
                 document.getElementById('resultado').innerHTML = resultado.texto;
                 document.getElementById('fuente').innerHTML = `
                     Cotización utilizada: ${dolarBlueData.valor.toFixed(2)} ARS por USD<br>
-                    Fuente: <a href="${dolarBlueData.fuente}" target="_blank">${dolarBlueData.fuente}</a>
+                    Fuente: <a href="https://bluelytics.com.ar/" target="_blank">${dolarBlueData.fuente}</a>
                 `;
             }
         });
     </script>
 </body>
-    </html>
+</html>
