@@ -66,8 +66,16 @@
     <div class="container">
         <h1>Calculadora de Importación</h1>
         <div class="form-group">
+            <label for="url">URL del Producto (opcional)</label>
+            <input type="url" id="url" placeholder="Pega aquí la URL de Amazon o eBay">
+        </div>
+        <div class="form-group">
             <label for="precio">Precio del producto (USD)</label>
             <input type="number" id="precio" placeholder="Ej: 829">
+        </div>
+        <div class="form-group">
+            <label for="envio">Costo de envío (USD)</label>
+            <input type="number" id="envio" placeholder="Ej: 50">
         </div>
         <div class="form-group">
             <label for="categoria">Categoría</label>
@@ -93,16 +101,19 @@
             }
         }
 
-        function calcularImportacion(precio, categoria, dolarBlue) {
+        function calcularImportacion(precio, envio, categoria, dolarBlue) {
             const limiteBase = 400;
             const iva = 0.21;
             const arancel = 0.38;
+
+            // Sumar costo de envío al precio base
+            const precioTotal = precio + envio;
 
             // Primeros 400 USD
             const montoBaseConIVA = limiteBase * 1.21;
 
             // Excedente
-            let excedente = Math.max(0, precio - limiteBase);
+            let excedente = Math.max(0, precioTotal - limiteBase);
             let excedenteConArancel = excedente * 1.38;
             let excedenteConIVA = excedenteConArancel * 1.21;
 
@@ -122,6 +133,8 @@
             return {
                 texto: `
                     Precio del Producto: ${precio.toFixed(2)} USD<br>
+                    Costo de Envío: ${envio.toFixed(2)} USD<br>
+                    Total con Envío: ${precioTotal.toFixed(2)} USD<br>
                     Primeros 400 USD (con IVA): ${montoBaseConIVA.toFixed(2)} USD<br>
                     Excedente (con arancel e IVA): ${excedenteConIVA.toFixed(2)} USD<br>
                     Total a pagar en USD: ${precioFinalUSD.toFixed(2)} USD<br>
@@ -133,7 +146,9 @@
         }
 
         document.getElementById('calcular').addEventListener('click', async () => {
+            const url = document.getElementById('url').value;
             const precio = parseFloat(document.getElementById('precio').value);
+            const envio = parseFloat(document.getElementById('envio').value) || 0;
             const categoria = document.getElementById('categoria').value;
 
             if (isNaN(precio) || precio <= 0) {
@@ -143,7 +158,7 @@
 
             const dolarBlueData = await obtenerDolarBlue();
             if (dolarBlueData) {
-                const resultado = calcularImportacion(precio, categoria, dolarBlueData.valor);
+                const resultado = calcularImportacion(precio, envio, categoria, dolarBlueData.valor);
                 document.getElementById('resultado').innerHTML = resultado.texto;
                 document.getElementById('fuente').innerHTML = `
                     Cotización utilizada: ${dolarBlueData.valor.toFixed(2)} ARS por USD<br>
