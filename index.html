@@ -44,22 +44,64 @@
             margin-bottom: 5px;
             font-weight: bold;
         }
-        input, button {
+        input, button, a {
             width: 100%;
             padding: 10px;
             font-size: 16px;
-            border: 1px solid #ccc;
             border-radius: 5px;
             margin-bottom: 15px;
+            text-align: center;
+            display: block;
+            text-decoration: none;
         }
         button {
-            background: #007bff;
-            color: #fff;
             font-weight: bold;
             cursor: pointer;
             border: none;
         }
-        button:hover {
+        button:hover, a:hover {
+            opacity: 0.9;
+        }
+        .btn-calculate {
+            background: #007bff;
+            color: #fff;
+            border: none;
+            transition: all 0.3s ease-in-out;
+        }
+        .btn-calculate:hover {
+            background: #0056b3;
+        }
+        .btn-whatsapp {
+            background: #25d366;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border: none;
+            transition: all 0.3s ease-in-out;
+        }
+        .btn-whatsapp:hover {
+            background: #20b856;
+        }
+        .btn-pdf {
+            background: #007bff;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border: none;
+            transition: all 0.3s ease-in-out;
+        }
+        .btn-pdf.descargado {
+            background: #28a745;
+        }
+        .btn-pdf:hover {
             background: #0056b3;
         }
         .result {
@@ -71,22 +113,11 @@
         }
         .actions {
             display: flex;
-            justify-content: space-between;
-            margin-top: 20px;
+            gap: 10px;
         }
-        .actions button, .actions a {
-            width: 48%;
-            text-align: center;
-            text-decoration: none;
-            color: #fff;
-            font-weight: bold;
-            background: #28a745;
-            border: none;
-            padding: 10px;
-            border-radius: 5px;
-        }
-        .actions button:hover, .actions a:hover {
-            background: #218838;
+        .icon {
+            width: 20px;
+            height: auto;
         }
     </style>
 </head>
@@ -105,11 +136,17 @@
             <label for="envio">Costo de Envío (USD)</label>
             <input type="number" id="envio" placeholder="Ej: 50">
         </div>
-        <button onclick="calcular()">Calcular</button>
+        <button class="btn-calculate" onclick="calcular()">Calcular</button>
         <div class="result" id="resultado"></div>
         <div class="actions" id="actions" style="display: none;">
-            <a id="whatsappLink" target="_blank">Compartir por WhatsApp</a>
-            <button onclick="descargarPDF()">Descargar en PDF</button>
+            <a id="whatsappLink" target="_blank" class="btn-whatsapp">
+                <img class="icon" src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp">
+                Compartir por WhatsApp
+            </a>
+            <button id="pdfButton" class="btn-pdf" onclick="descargarPDF()">
+                <img class="icon" src="https://upload.wikimedia.org/wikipedia/commons/8/87/Download_icon.svg" alt="PDF">
+                Descargar en PDF
+            </button>
         </div>
     </div>
 
@@ -142,16 +179,13 @@
 
             const precioTotal = precio + envio;
 
-            // Cálculo de los primeros $400 con IVA
             const baseConIVA = Math.min(precioTotal, limiteBase).toFixed(3);
             const ivaSobreBase = (baseConIVA * iva).toFixed(3);
 
-            // Cálculo del excedente (si supera los $400)
             const excedente = Math.max(0, precioTotal - limiteBase).toFixed(3);
             const montoArancel = (excedente * arancel).toFixed(3);
             const ivaSobreExcedente = ((parseFloat(excedente) + parseFloat(montoArancel)) * iva).toFixed(3);
 
-            // Total final en USD
             const precioFinalUSD = (
                 parseFloat(baseConIVA) +
                 parseFloat(ivaSobreBase) +
@@ -160,10 +194,8 @@
                 parseFloat(ivaSobreExcedente)
             ).toFixed(3);
 
-            // Total final en ARS (conversión al dólar blue)
             const precioFinalARS = (precioFinalUSD * dolarBlue.valorDolar).toFixed(3);
 
-            // Mostrar resultados
             const resultadoHTML = `
                 <h3>Resultados:</h3>
                 Precio del Producto: $${precio.toFixed(2)} USD<br>
@@ -180,19 +212,4 @@
             `;
             document.getElementById('resultado').innerHTML = resultadoHTML;
 
-            // Mostrar acciones
             document.getElementById('actions').style.display = 'flex';
-
-            // Configurar enlace de WhatsApp
-            const whatsappMessage = `Calculadora de Importación:%0A${resultadoHTML.replace(/<br>/g, '\n').replace(/<\/?[^>]+(>|$)/g, '')}`;
-            document.getElementById('whatsappLink').href = `https://wa.me/?text=${encodeURIComponent(whatsappMessage)}`;
-        }
-
-        function descargarPDF() {
-            const doc = new window.jspdf.jsPDF();
-            doc.text(document.getElementById('resultado').innerText, 10, 10);
-            doc.save('calculo_importacion.pdf');
-        }
-    </script>
-</body>
-</html>
