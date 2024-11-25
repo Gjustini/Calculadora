@@ -26,6 +26,16 @@
             font-size: 24px;
             margin-bottom: 20px;
         }
+        .logo-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .logo-container img {
+            width: 100px;
+            height: auto;
+        }
         .form-group {
             margin-bottom: 15px;
         }
@@ -101,6 +111,10 @@
 <body>
     <div class="container">
         <h1>Calculadora de Importación</h1>
+        <div class="logo-container">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" alt="Amazon Logo">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/1/1b/EBay_logo.svg" alt="eBay Logo">
+        </div>
         <div class="form-group">
             <label for="precio">Precio del Producto (USD)</label>
             <input type="number" id="precio" placeholder="Ej: 829">
@@ -204,10 +218,4 @@
             doc.text(document.getElementById('resultado').innerText, 10, 10);
             doc.save('calculo_importacion.pdf');
 
-            const pdfButton = document.getElementById('pdfButton');
-            pdfButton.innerText = "Descargado";
-            pdfButton.classList.add('descargado');
-        }
-    </script>
-</body>
-</html>
+            const pdf
